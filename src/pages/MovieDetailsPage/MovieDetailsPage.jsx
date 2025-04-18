@@ -9,3 +9,5 @@ const MovieDetailsPage = () => {
   );
 };
 export default MovieDetailsPage;
+
+// MovieDetailsPage, сторінка із детальною інформацією про кінофільм

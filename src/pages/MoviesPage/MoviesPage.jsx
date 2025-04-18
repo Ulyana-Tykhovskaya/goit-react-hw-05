@@ -6,3 +6,4 @@ const MoviesPage = () => {
   );
 };
 export default MoviesPage;
+// сторінка пошуку кінофільмів за ключовим словом
