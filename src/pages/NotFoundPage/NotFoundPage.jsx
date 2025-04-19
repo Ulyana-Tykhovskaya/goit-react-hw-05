@@ -4,8 +4,7 @@ const NotFoundPage = () => {
     <main>
       <h1>404 - Not Found</h1>
       <p>
-        Цю сторінку не знайдено. Перейти на{" "}
-        <link to="/src/pages/HomePage">головну</link>
+        Цю сторінку не знайдено. Перейти на <Link to="/">головну/</Link>
       </p>
     </main>
   );
