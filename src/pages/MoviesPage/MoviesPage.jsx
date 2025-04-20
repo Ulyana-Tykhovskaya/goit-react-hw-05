@@ -1,44 +1,68 @@
-import { useState } from "react";
-import { searchMovies } from "../../services/api";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import MovieList from "../../components/MovieList/MovieList";
+import axios from "axios";
+
 const MoviesPage = () => {
-  const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
   const [error, setError] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get("query") ?? "";
   const [loading, setLoading] = useState(false);
-  const handleChange = (e) => {
-    setQuery(e.target.value);
-  };
-  const handleSubmit = async (e) => {
+  const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    if (!query) return;
+
+    const fetchMovies = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          `https://api.themoviedb.org/3/search/movie`,
+          {
+            params: {
+              query,
+              api_key: "5be8d2b79de49537a3f44c271cab9fcc",
+              language: "en-US",
+              include_adult: false,
+            },
+          }
+        );
+        setMovies(response.data.results);
+      } catch {
+        setError("Не удалось загрузить фильмы.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMovies();
+  }, [query]);
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (!query.trim()) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const results = await searchMovies(query);
-      setMovies(results);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    if (inputValue.trim()) {
+      setSearchParams({ query: inputValue });
     }
   };
+
   return (
-    <div>
+    <main>
+      <h2>Поиск фильмов</h2>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          value={query}
-          onChange={handleChange}
-          placeholder="Search movies..."
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder="Введите название"
         />
-        <button type="submit">Search</button>
+        <button type="submit">Искать</button>
       </form>
-      {loading && <p>Loading...</p>}
-      {error && <p>Error: {error}</p>}
+
+      {loading && <p>Загрузка...</p>}
+      {error && <p>{error}</p>}
       {movies.length > 0 && <MovieList movies={movies} />}
-    </div>
+    </main>
   );
 };
 export default MoviesPage;
-// сторінка пошуку кінофільмів за ключовим словом

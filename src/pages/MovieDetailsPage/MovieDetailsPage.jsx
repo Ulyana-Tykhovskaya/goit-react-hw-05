@@ -1,11 +1,11 @@
 import { useParams, Outlet, Link, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 
 const MovieDetailsPage = () => {
   const { movieId } = useParams();
   const location = useLocation();
-  const backLink = location.state?.from || "/";
+  const backLinkRef = useRef(location.state?.from || "/movies");
   const [movie, setMovie] = useState(null);
   const [error, setError] = useState(null);
 
@@ -16,9 +16,8 @@ const MovieDetailsPage = () => {
           `https://api.themoviedb.org/3/movie/${movieId}?api_key=5be8d2b79de49537a3f44c271cab9fcc&language=en-US`
         );
         setMovie(response.data);
-      } catch (err) {
-        console.error("Error fetching movie details:", err);
-        setError("Не удалось загрузить информацию о фильме.");
+      } catch {
+        setError("Не удалось загрузить детали фильма.");
       }
     };
 
@@ -37,7 +36,7 @@ const MovieDetailsPage = () => {
 
   return (
     <main>
-      <Link to={backLink}>⬅️ Назад</Link>
+      <Link to={backLinkRef.current}>⬅️ Назад</Link>
       <h2>{title}</h2>
       {poster_path && (
         <img
@@ -54,12 +53,12 @@ const MovieDetailsPage = () => {
       <p>Дополнительная информация:</p>
       <ul>
         <li>
-          <Link to="cast" state={{ from: backLink }}>
+          <Link to="cast" state={{ from: backLinkRef.current }}>
             Актёры
           </Link>
         </li>
         <li>
-          <Link to="reviews" state={{ from: backLink }}>
+          <Link to="reviews" state={{ from: backLinkRef.current }}>
             Отзывы
           </Link>
         </li>
